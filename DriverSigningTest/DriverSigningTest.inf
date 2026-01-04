@@ -1,0 +1,62 @@
+;
+; DriverSigningTest.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = DriverSigningTest.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+DriverSigningTest.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%DriverSigningTest.DeviceDesc% = DriverSigningTest_Device, Root\DriverSigningTest ; TODO: edit hw-id
+
+[DriverSigningTest_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+DriverSigningTest.sys
+
+;-------------- Service installation
+[DriverSigningTest_Device.NT.Services]
+AddService = DriverSigningTest,%SPSVCINST_ASSOCSERVICE%, DriverSigningTest_Service_Inst
+
+; -------------- DriverSigningTest driver install sections
+[DriverSigningTest_Service_Inst]
+DisplayName    = %DriverSigningTest.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\DriverSigningTest.sys
+
+[DriverSigningTest_Device.NT.Wdf]
+KmdfService = DriverSigningTest, DriverSigningTest_wdfsect
+
+[DriverSigningTest_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "DriverSigningTest Installation Disk"
+DriverSigningTest.DeviceDesc = "DriverSigningTest Device"
+DriverSigningTest.SVCDESC = "DriverSigningTest Service"
